@@ -3,16 +3,13 @@
 
 #include "Vec3.h"
 
-struct Fluid
+struct FluidParticle
 {
-    Fluid() = default;
+    FluidParticle() = default;
     Vec3 pos;
-    Vec3 colour;
     Vec3 dir;
-
-    float size;
-    float viscosity;
-    //float velocity;
-    float density;
+    Vec3 colour;
+    float size = 1.0f;
+    int life = 100;
 };
 #endif

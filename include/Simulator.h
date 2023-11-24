@@ -3,15 +3,21 @@
 
 #include "Fluid.h"
 
-class Simulator
+class FluidSimulator
 {
 public:
-    Simulator(Vec3 _pos);
-    void draw() const;
-    void update();
+    FluidSimulator(size_t _numParticles);
+    size_t numParticles() const;
+    void Initialize();
+    void Draw() const;
+    void Update();
 private:
-    void rebound(Fluid &_f); //to handle collision with wall and surfaces etc
 
+};
+
+class SPHSimulator
+{
+    void Initialize(); //smoothed particle hydrodynamics
 };
 
 #endif
