@@ -1,43 +1,91 @@
 #include <gtest/gtest.h>
 #include "Fluid.h"
-#include "Vec3.h"
+#include "Simulator.h"
 
+//@Particle Tests
+//Modified from ASE Labs
 
-TEST(Fluid,ctor)
+TEST(Particle, ctor)
 {
-    FluidParticle fp;
-    EXPECT_FLOAT_EQ(fp.pos.x, 0.0f);
-    EXPECT_FLOAT_EQ(fp.pos.y, 0.0f);
-    EXPECT_FLOAT_EQ(fp.pos.z, 0.0f);
+    Particle p;
 
-    EXPECT_FLOAT_EQ(fp.dir.x, 0.0f);
-    EXPECT_FLOAT_EQ(fp.dir.y, 0.0f);
-    EXPECT_FLOAT_EQ(fp.dir.z, 0.0f);
+    EXPECT_FLOAT_EQ(p.pos.m_x, 0.0f);
+    EXPECT_FLOAT_EQ(p.pos.m_y, 0.0f);
+    EXPECT_FLOAT_EQ(p.pos.m_z, 0.0f);
 
-    EXPECT_FLOAT_EQ(fp.colour.x, 0.0f);
-    EXPECT_FLOAT_EQ(fp.colour.y, 0.0f);
-    EXPECT_FLOAT_EQ(fp.colour.z, 0.0f);
+    EXPECT_FLOAT_EQ(p.dir.m_x, 0.0f);
+    EXPECT_FLOAT_EQ(p.dir.m_y, 0.0f);
+    EXPECT_FLOAT_EQ(p.dir.m_z, 0.0f);
 
-    EXPECT_FLOAT_EQ(fp.size, 1.0f);
-    EXPECT_EQ(fp.life, 100);
+    EXPECT_FLOAT_EQ(p.vel.m_x, 0.0f);
+    EXPECT_FLOAT_EQ(p.vel.m_y, 0.0f);
+    EXPECT_FLOAT_EQ(p.vel.m_z, 0.0f);
 }
 
-TEST(Vec3, ctor)
-{
-    Vec3 v;
-    EXPECT_FLOAT_EQ(v.x, 0.0f);
-    EXPECT_FLOAT_EQ(v.y, 0.0f);
-    EXPECT_FLOAT_EQ(v.z, 0.0f);
-}
+
+//@Fluid Tests
+// Modified from chatGPT
+// Prompt "what would a test for this fluid struct look like?:
+// struct Fluid
+//{
+//    std::vector<Particle> fluidParticles;
+//};"
+// Result
+// TEST_CASE("Fluid struct tests", "[Fluid]") {
+//    // Test case 1: Default constructor
+//    SECTION("Default constructor") {
+//        Fluid fluid;
+//        REQUIRE(fluid.fluidParticles.empty());
+//    }
+//    // Test case 2: Adding particles
+//    SECTION("Adding particles") {
+//        Fluid fluid;
+//        Particle particle1(/* initialize particle here */);
+//        Particle particle2(/* initialize another particle here */);
+//        fluid.fluidParticles.push_back(particle1);
+//        fluid.fluidParticles.push_back(particle2);
+//        REQUIRE(fluid.fluidParticles.size() == 2);
+//        REQUIRE(fluid.fluidParticles[0] == particle1);
+//        REQUIRE(fluid.fluidParticles[1] == particle2);
+//    }
+//    // Add more test cases as needed...
+//    // Test case n: Clearing particles
+//    SECTION("Clearing particles") {
+//        Fluid fluid;
+//        Particle particle(/* initialize particle here */);
+//        fluid.fluidParticles.push_back(particle);
+//
+//        fluid.fluidParticles.clear();
+//        REQUIRE(fluid.fluidParticles.empty());
+//    }
+
+//TEST(Fluid, ctor)
+//{
+//    Fluid f;
+//
+//    // Adding particles
+//    Particle p1;
+//    Particle p2;
+//    Particle p3;
+//
+//    f.fluidParticles.push_back(p1);
+//    f.fluidParticles.push_back(p2);
+//    f.fluidParticles.push_back(p3);
+//
+//    EXPECT_EQ(f.fluidParticles.size(), 3);
+//}
 
 TEST(Simulator, ctor)
 {
-    // TODO
+   Simulator s(ngl::Vec3(0.5f, 0.0f, 0.0f),100);
+   EXPECT_EQ(s.numParticles(), 20);
+   auto pos = s.getPosition();
+   EXPECT_FLOAT_EQ(pos.x, 0.5f);
+   EXPECT_FLOAT_EQ(pos.y, 0.0f);
+   EXPECT_FLOAT_EQ(pos.z, 0.0f);
 }
 
-
-TEST(Domain, ctor)
+TEST(Simulator, Smoothing)
 {
-    // TODO
-}
 
+}
