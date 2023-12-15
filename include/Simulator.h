@@ -1,10 +1,9 @@
-#ifndef SIMULATOR_H_
-#define SIMULATOR_H_
-
+#ifndef EMITTER_H_
+#define EMITTER_H_
 #include <cstdlib>
 #include <vector>
 #include "Fluid.h"
-#include <string_view>0
+#include <string_view>
 
 #include <ngl/AbstractVAO.h>
 #include <memory>
@@ -12,27 +11,32 @@
 class Simulator
 {
 public :
-    Simulator(ngl::Vec3 _pos,size_t _numParticles);
+    Simulator(ngl::Vec3 _pos, size_t _numParticles);
     size_t numParticles() const;
     ngl::Vec3 getPosition() const;
     void draw() const;
     void update(float _delta);
     void getPressureDensity();
-    float smoothingKernel(float _r); 
+    float smoothingKernel(float _r);
 private :
-    [[nodiscard]] ngl::Vec3 randomVectorOnSphere(float _radius = 2.0f);
+    [[nodiscard]] ngl::Vec3 randomVectorOnSphere(float _radius = 1.0f);
     void resetParticle(Particle &_p);
     void birthParticles();
-    std::vector<Particle> m_particles;
+    ngl::Vec3 smoothingKernelGrad(const ngl::Vec3 &_r);
+    float smoothingKernelLaplacian(const ngl::Vec3 &_r);
+
+    ngl::Vec3 applyViscosity(const Particle &_p);
+
+    Fluid m_fluid;
     ngl::Vec3 m_pos;
-    ngl::Vec3 m_emitDir={0.5f,0.5f,0.0f};
-    float m_spread=5.0f;
+    ngl::Vec3 m_emitDir={0.0f,0.5f,0.0f};
+    float m_spread=0.5f;
     // max alive at one time
-    size_t m_maxAlive =5000;
+    size_t m_maxAlive = 3000;
     // max birthed at one time
     size_t m_numPerFrame =200;
     std::unique_ptr<ngl::AbstractVAO> m_vao;
 };
 
 
-#endif //SIMULATOR_H_
+#endif

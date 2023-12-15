@@ -3,7 +3,6 @@
 #include <ngl/Vec3.h>
 #include <cstdlib>
 
-enum class ParticleState : bool {Alive,Dead};
 struct Particle
 {
     Particle()=default;
@@ -14,10 +13,13 @@ struct Particle
     float density = 0.0f;
     float pressure = 0.0f;
     float mass = static_cast <float> (std::rand()) / static_cast <float> (RAND_MAX);
-    // float stiffness = 0.2f;
+    float stiffness = 0.2f;
     int life=100;
-    ParticleState alive = ParticleState::Dead;
 };
 
+struct Fluid
+{
+    std::vector<Particle> particles;
+};
 
 #endif

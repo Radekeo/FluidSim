@@ -5,7 +5,6 @@
 #include <ngl/NGLInit.h>
 #include <ngl/VAOPrimitives.h>
 #include <ngl/ShaderLib.h>
-#include <ngl/VAOPrimitives.h>
 #include <ngl/Util.h>
 #include <iostream>
 
@@ -18,7 +17,7 @@ NGLScene::NGLScene()
 
 NGLScene::~NGLScene()
 {
-    std::cout<<"Shutting down NGL, removing VAO's and Shaders\n";
+    std::cout<<"Shutting down NGL, removing VAOs and Shaders\n";
 }
 
 
@@ -42,10 +41,10 @@ void NGLScene::initializeGL()
     // enable multisampling for smoother drawing
     glEnable(GL_MULTISAMPLE);
 
-    m_simulator=std::make_unique<Simulator>(ngl::Vec3(0.0f,0.0f,0.0f),100000);
+    m_emitter=std::make_unique<Simulator>(ngl::Vec3(0.0f, 10.0f, 0.0f), 10000);
 
-    ngl::ShaderLib::loadShader("FluidShader","shaders/FluidVertex.glsl","shaders/FluidFragment.glsl");
-    ngl::ShaderLib::use("FluidShader");
+    ngl::ShaderLib::loadShader("ParticleShader","shaders/ParticleVertex.glsl","shaders/ParticleFragment.glsl");
+    ngl::ShaderLib::use("ParticleShader");
     m_view=ngl::lookAt({0,0,24},{0,0,0},{0,1,0});
     ngl::ShaderLib::setUniform("MVP",m_project*m_view);
     startTimer(10);
@@ -70,9 +69,9 @@ void NGLScene::paintGL()
     mouseRotation.m_m[3][2] = m_modelPos.m_z;
 
 
-    ngl::ShaderLib::use("FluidShader");
+    ngl::ShaderLib::use("ParticleShader");
     ngl::ShaderLib::setUniform("MVP",m_project*m_view*mouseRotation);
-    m_simulator->draw();
+    m_emitter->draw();
     ngl::ShaderLib::use(ngl::nglColourShader);
     ngl::ShaderLib::setUniform("Colour",1.0f,0.0f,1.0f,1.0f);
     ngl::ShaderLib::setUniform("MVP",m_project*m_view*mouseRotation);
@@ -112,6 +111,6 @@ void NGLScene::timerEvent(QTimerEvent *_event)
     auto delta = std::chrono::duration<float,std::chrono::seconds::period>(now-m_previousTime).count();
     m_previousTime=now;
     //std::cout<<delta.count()<<"\n";
-    m_simulator->update(delta);
+    m_emitter->update(delta);
     update();
 }

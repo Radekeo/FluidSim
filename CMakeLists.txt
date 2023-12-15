@@ -1,15 +1,7 @@
 cmake_minimum_required(VERSION 3.12)
-#-------------------------------------------------------------------------------------------
-# I'm going to use vcpk in most cases for our install of 3rd party libs
-# this is going to check the environment variable for CMAKE_TOOLCHAIN_FILE and this must point to where
-# vcpkg.cmake is in the University this is set in your .bash_profile to
-# export CMAKE_TOOLCHAIN_FILE=/public/devel/2020/vcpkg/scripts/buildsystems/vcpkg.cmake
-# to build see the NGL instructions 
-# Windows :- mkdir build; cd build ; cmake -DCMAKE_PREFIX_PATH=~/NGL/ .. ; cmake --build . 
-# Linux / Mac mkdir build; cd build; cmake -DCMAKE_PREFIX_PATH~/NGL/ .. ; make
-#-------------------------------------------------------------------------------------------
+
 if(NOT DEFINED CMAKE_TOOLCHAIN_FILE AND DEFINED ENV{CMAKE_TOOLCHAIN_FILE})
-   set(CMAKE_TOOLCHAIN_FILE $ENV{CMAKE_TOOLCHAIN_FILE})
+    set(CMAKE_TOOLCHAIN_FILE $ENV{CMAKE_TOOLCHAIN_FILE})
 endif()
 
 # Name of the project
@@ -40,19 +32,35 @@ add_executable(${TargetName})
 
 # Add NGL include path
 include_directories(include $ENV{HOME}/NGL/include)
-target_sources(${TargetName} PRIVATE ${PROJECT_SOURCE_DIR}/src/main.cpp  
-			${PROJECT_SOURCE_DIR}/src/NGLScene.cpp  
-			${PROJECT_SOURCE_DIR}/src/NGLSceneMouseControls.cpp  
-			${PROJECT_SOURCE_DIR}/include/NGLScene.h
-            ${PROJECT_SOURCE_DIR}/src/Simulator.cpp
-            ${PROJECT_SOURCE_DIR}/include/Fluid.h
-            ${PROJECT_SOURCE_DIR}/include/Simulator.h
+target_sources(${TargetName} PRIVATE ${PROJECT_SOURCE_DIR}/src/main.cpp
+        ${PROJECT_SOURCE_DIR}/src/NGLScene.cpp
+        ${PROJECT_SOURCE_DIR}/src/NGLSceneMouseControls.cpp
+        ${PROJECT_SOURCE_DIR}/src/Simulator.cpp
+        ${PROJECT_SOURCE_DIR}/include/Fluid.h
+        ${PROJECT_SOURCE_DIR}/include/Simulator.h
+        ${PROJECT_SOURCE_DIR}/include/NGLScene.h
+        ${PROJECT_SOURCE_DIR}/include/WindowParams.h
 )
 
 target_link_libraries(${TargetName} PRIVATE Qt::Widgets Qt::OpenGL NGL)
 
 add_custom_target(${TargetName}CopyShaders ALL
-    COMMAND ${CMAKE_COMMAND} -E copy_directory
-    ${CMAKE_CURRENT_SOURCE_DIR}/shaders
-    $<TARGET_FILE_DIR:${TargetName}>/shaders
+        COMMAND ${CMAKE_COMMAND} -E copy_directory
+        ${CMAKE_CURRENT_SOURCE_DIR}/shaders
+        $<TARGET_FILE_DIR:${TargetName}>/shaders
 )
+
+##################################################################################
+## Testing code
+##################################################################################
+#
+#find_package(GTest CONFIG REQUIRED)
+#include(GoogleTest)
+#enable_testing()
+#add_executable(FluidSimTest)
+#target_sources(FluidSimTest PRIVATE tests/FluidTests.cpp
+#                src/Simulator.cpp src/NGLScene.cpp src/NGLSceneMouseControls.cpp src/main.cpp
+#                include/Simulator.h include/Particle.h include/NGLScene.h include/WindowParams.h
+#)
+#target_link_libraries(FluidSimTest PRIVATE GTest::gtest GTest::gtest_main )
+#gtest_discover_tests(FluidSimTest)

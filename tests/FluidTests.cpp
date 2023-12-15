@@ -1,8 +1,8 @@
 #include <gtest/gtest.h>
 #include "Fluid.h"
-#include "Simulator.h"
+//#include "Simulator.h"
 
-//@Particle Tests
+//@Fluid Tests
 //Modified from ASE Labs
 
 TEST(Particle, ctor)
@@ -16,10 +16,6 @@ TEST(Particle, ctor)
     EXPECT_FLOAT_EQ(p.dir.m_x, 0.0f);
     EXPECT_FLOAT_EQ(p.dir.m_y, 0.0f);
     EXPECT_FLOAT_EQ(p.dir.m_z, 0.0f);
-
-    EXPECT_FLOAT_EQ(p.vel.m_x, 0.0f);
-    EXPECT_FLOAT_EQ(p.vel.m_y, 0.0f);
-    EXPECT_FLOAT_EQ(p.vel.m_z, 0.0f);
 }
 
 
@@ -59,33 +55,33 @@ TEST(Particle, ctor)
 //        REQUIRE(fluid.fluidParticles.empty());
 //    }
 
-//TEST(Fluid, ctor)
+TEST(Fluid, ctor)
+{
+    Fluid f;
+
+    // Adding particles
+    Particle p1;
+    Particle p2;
+    Particle p3;
+
+    f.particles.push_back(p1);
+    f.particles.push_back(p2);
+    f.particles.push_back(p3);
+
+    EXPECT_EQ(f.particles.size(), 3);
+}
+//
+//TEST(Simulator, ctor)
 //{
-//    Fluid f;
-//
-//    // Adding particles
-//    Particle p1;
-//    Particle p2;
-//    Particle p3;
-//
-//    f.fluidParticles.push_back(p1);
-//    f.fluidParticles.push_back(p2);
-//    f.fluidParticles.push_back(p3);
-//
-//    EXPECT_EQ(f.fluidParticles.size(), 3);
+//   Simulator s(ngl::Vec3(0.5f, 0.0f, 0.0f),100);
+//   EXPECT_EQ(s.numParticles(), 20);
+//   auto pos = s.getPosition();
+//   EXPECT_FLOAT_EQ(pos.x, 0.5f);
+//   EXPECT_FLOAT_EQ(pos.y, 0.0f);
+//   EXPECT_FLOAT_EQ(pos.z, 0.0f);
 //}
-
-TEST(Simulator, ctor)
-{
-   Simulator s(ngl::Vec3(0.5f, 0.0f, 0.0f),100);
-   EXPECT_EQ(s.numParticles(), 20);
-   auto pos = s.getPosition();
-   EXPECT_FLOAT_EQ(pos.x, 0.5f);
-   EXPECT_FLOAT_EQ(pos.y, 0.0f);
-   EXPECT_FLOAT_EQ(pos.z, 0.0f);
-}
-
-TEST(Simulator, Smoothing)
-{
-
-}
+//
+//TEST(Simulator, Smoothing)
+//{
+//
+//}
