@@ -1,5 +1,5 @@
-#ifndef EMITTER_H_
-#define EMITTER_H_
+#ifndef SIMULATOR_H_
+#define SIMULATOR_H_
 #include <cstdlib>
 #include <vector>
 #include "Fluid.h"

@@ -4,6 +4,7 @@
 #include "WindowParams.h"
 // this must be included after NGL includes else we get a clash with gl libs
 #include <QOpenGLWindow>
+#include <QWidget>
 #include "Simulator.h"
 #include <memory>
 #include <ngl/Mat4.h>
@@ -49,7 +50,7 @@ public:
     void resizeGL(int _w, int _h) override;
 
 private:
-
+    QWidget* m_widget;
     //----------------------------------------------------------------------------------------------------------------------
     /// @brief Qt Event called when a key is pressed
     /// @param [in] _event the Qt event to query for size etc

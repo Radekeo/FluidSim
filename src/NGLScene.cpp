@@ -1,5 +1,9 @@
 #include <QMouseEvent>
 #include <QGuiApplication>
+#include <QGridLayout>
+#include <QPushButton>
+#include <QRect>
+
 
 #include "NGLScene.h"
 #include <ngl/NGLInit.h>
@@ -12,6 +16,9 @@ NGLScene::NGLScene()
 {
     // re-size the widget to that of the parent (in this case the GLFrame passed in on construction)
     setTitle("Fluid Simulator");
+    m_widget = QWidget::createWindowContainer(this);
+    m_widget->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);    
+
 }
 
 
@@ -52,6 +59,17 @@ void NGLScene::initializeGL()
 
     m_previousTime = std::chrono::steady_clock::now();
 
+    QGridLayout *m_grid = new QGridLayout(m_widget);
+    m_widget->setLayout(m_grid); // Example layout
+
+    QPushButton* m_button = new QPushButton("push", m_widget);
+    m_grid->addWidget(m_button);
+    // set the name
+    m_button->setObjectName(QString::fromUtf8("button"));
+    // set the geometry
+    m_button->setGeometry(QRect(10, 80, 100, 32));
+    // set the text of the button
+    m_button->setText("push");
 }
 
 

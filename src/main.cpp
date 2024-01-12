@@ -1,7 +1,8 @@
 /****************************************************************************
 basic OpenGL demo modified from http://qt-project.org/doc/qt-5.0/qtgui/openglwindow.html
 ****************************************************************************/
-#include <QtGui/QGuiApplication>
+// #include <QtGui/QGuiApplication>
+#include <QApplication>
 #include <iostream>
 #include "NGLScene.h"
 
@@ -9,7 +10,8 @@ basic OpenGL demo modified from http://qt-project.org/doc/qt-5.0/qtgui/openglwin
 
 int main(int argc, char **argv)
 {
-    QGuiApplication app(argc, argv);
+    // QGuiApplication app(argc, argv);
+    QApplication app(argc, argv);
     // create an OpenGL format specifier
     QSurfaceFormat format;
     // set the number of samples for multisampling
