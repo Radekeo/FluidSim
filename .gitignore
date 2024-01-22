@@ -3,3 +3,4 @@ cmake-*
 *.~
 *.O
 *.pro
+FluidSim_autogen
