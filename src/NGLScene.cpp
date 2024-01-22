@@ -1,42 +1,26 @@
-#include <QMouseEvent>
+#include <iostream>
+
 #include <QGuiApplication>
-#include <QGridLayout>
-#include <QPushButton>
-#include <QRect>
 
-
-#include "NGLScene.h"
 #include <ngl/NGLInit.h>
 #include <ngl/VAOPrimitives.h>
 #include <ngl/ShaderLib.h>
 #include <ngl/Util.h>
-#include <iostream>
 
-NGLScene::NGLScene()
+#include "NGLScene.h"
+
+
+//----------------------------------------------------------------------------------------------------------------------
+NGLScene::NGLScene( QWidget *_parent ) : QOpenGLWidget( _parent )
 {
+//    setTitle("Fluid Simulator");
+    // set this widget to have the initial keyboard focus
+    setFocus();
     // re-size the widget to that of the parent (in this case the GLFrame passed in on construction)
-    setTitle("Fluid Simulator");
-    m_widget = QWidget::createWindowContainer(this);
-    m_widget->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);    
-
+    resize(_parent->size());
 }
 
-
-NGLScene::~NGLScene()
-{
-    std::cout<<"Shutting down NGL, removing VAOs and Shaders\n";
-}
-
-
-
-void NGLScene::resizeGL(int _w , int _h)
-{
-    m_win.width  = static_cast<int>( _w * devicePixelRatio() );
-    m_win.height = static_cast<int>( _h * devicePixelRatio() );
-    m_project=ngl::perspective(45.0f,static_cast<float>(_w)/_h,0.1f,100.0f);
-}
-
-
+//----------------------------------------------------------------------------------------------------------------------
 void NGLScene::initializeGL()
 {
     // we must call that first before any other GL commands to load and link the
@@ -48,7 +32,7 @@ void NGLScene::initializeGL()
     // enable multisampling for smoother drawing
     glEnable(GL_MULTISAMPLE);
 
-    m_emitter=std::make_unique<Simulator>(ngl::Vec3(0.0f, 10.0f, 0.0f), 10000);
+    m_emitter=std::make_unique<Simulator>(ngl::Vec3(0.0f, 5.0f, 0.0f), 100);
 
     ngl::ShaderLib::loadShader("ParticleShader","shaders/ParticleVertex.glsl","shaders/ParticleFragment.glsl");
     ngl::ShaderLib::use("ParticleShader");
@@ -58,21 +42,17 @@ void NGLScene::initializeGL()
     ngl::VAOPrimitives::createLineGrid("floor",40,40,10);
 
     m_previousTime = std::chrono::steady_clock::now();
-
-    QGridLayout *m_grid = new QGridLayout(m_widget);
-    m_widget->setLayout(m_grid); // Example layout
-
-    QPushButton* m_button = new QPushButton("push", m_widget);
-    m_grid->addWidget(m_button);
-    // set the name
-    m_button->setObjectName(QString::fromUtf8("button"));
-    // set the geometry
-    m_button->setGeometry(QRect(10, 80, 100, 32));
-    // set the text of the button
-    m_button->setText("push");
 }
 
-
+//----------------------------------------------------------------------------------------------------------------------
+//This virtual function is called whenever the widget has been resized.
+// The new size is passed in width and height.
+void NGLScene::resizeGL( int _w, int _h )
+{
+    m_win.width  = static_cast<int>( _w * devicePixelRatio() );
+    m_win.height = static_cast<int>( _h * devicePixelRatio() );
+    m_project=ngl::perspective(45.0f,static_cast<float>(_w)/_h,0.1f,100.0f);
+}
 
 void NGLScene::paintGL()
 {
@@ -93,11 +73,9 @@ void NGLScene::paintGL()
     ngl::ShaderLib::use(ngl::nglColourShader);
     ngl::ShaderLib::setUniform("Colour",1.0f,0.0f,1.0f,1.0f);
     ngl::ShaderLib::setUniform("MVP",m_project*m_view*mouseRotation);
-    ngl::VAOPrimitives::draw("floor");
+//    ngl::VAOPrimitives::draw("floor");
 
-
-//  ngl::VAOPrimitives::draw("teapot");
-
+//    ngl::VAOPrimitives::draw("teapot");
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -131,4 +109,10 @@ void NGLScene::timerEvent(QTimerEvent *_event)
     //std::cout<<delta.count()<<"\n";
     m_emitter->update(delta);
     update();
+}
+
+
+NGLScene::~NGLScene()
+{
+    std::cout << "Shutting down NGL, removing VAOs and Shaders\n";
 }

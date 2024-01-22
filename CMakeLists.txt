@@ -13,6 +13,9 @@ set(TargetName FluidSim)
 find_package(NGL CONFIG REQUIRED)
 # Instruct CMake to run moc automatically when needed (Qt projects only)
 set(CMAKE_AUTOMOC ON)
+# Run the uic tools and search in the ui folder
+set(CMAKE_AUTOUIC ON)
+set(CMAKE_AUTOUIC_SEARCH_PATHS ${PROJECT_SOURCE_DIR}/ui)
 # find Qt libs
 # find Qt libs first we check for Version 6
 find_package(Qt6 COMPONENTS OpenGL Widgets QUIET )
@@ -36,10 +39,12 @@ target_sources(${TargetName} PRIVATE ${PROJECT_SOURCE_DIR}/src/main.cpp
         ${PROJECT_SOURCE_DIR}/src/NGLScene.cpp
         ${PROJECT_SOURCE_DIR}/src/NGLSceneMouseControls.cpp
         ${PROJECT_SOURCE_DIR}/src/Simulator.cpp
+        ${PROJECT_SOURCE_DIR}/src/MainWindow.cpp
         ${PROJECT_SOURCE_DIR}/include/Fluid.h
         ${PROJECT_SOURCE_DIR}/include/Simulator.h
         ${PROJECT_SOURCE_DIR}/include/NGLScene.h
         ${PROJECT_SOURCE_DIR}/include/WindowParams.h
+        ${PROJECT_SOURCE_DIR}/include/MainWindow.h
 )
 
 target_link_libraries(${TargetName} PRIVATE Qt::Widgets Qt::OpenGL NGL)

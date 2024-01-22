@@ -1,0 +1,6 @@
+/home/s5636764/Courses/ASE/ase-assignment-Radekeo/CMakeFiles/rebuild_cache.dir
+/home/s5636764/Courses/ASE/ase-assignment-Radekeo/CMakeFiles/edit_cache.dir
+/home/s5636764/Courses/ASE/ase-assignment-Radekeo/CMakeFiles/FluidSim.dir
+/home/s5636764/Courses/ASE/ase-assignment-Radekeo/CMakeFiles/FluidSimCopyShaders.dir
+/home/s5636764/Courses/ASE/ase-assignment-Radekeo/CMakeFiles/FluidSim_autogen_timestamp_deps.dir
+/home/s5636764/Courses/ASE/ase-assignment-Radekeo/CMakeFiles/FluidSim_autogen.dir

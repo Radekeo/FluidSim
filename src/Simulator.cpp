@@ -1,7 +1,7 @@
 #include "Simulator.h"
 #include <ngl/Random.h>
-#include <iostream>
-#include <fstream>
+//#include <iostream>
+//#include <fstream>
 #include <algorithm>
 #include <ngl/VAOFactory.h>
 
@@ -23,13 +23,13 @@ Simulator::Simulator(ngl::Vec3 _pos, size_t _numParticles) : m_pos{_pos}
 void Simulator::resetParticle(Particle &_p)
 {
     _p.pos=m_pos;
-    // Set initial direction to point downward
+    // Set initial direction to fall downward
    _p.dir = ngl::Vec3(0.0f, -1.0f, 0.0f);
-    // _p.dir = randomVectorOnSphere(m_spread);
+//   _p.dir = randomVectorOnSphere(m_spread);
 
 //  _p.dir.m_y = std::abs(_p.dir.m_y);
     _p.colour=ngl::Random::getRandomColour3();
-    _p.life = 100 + static_cast<int>(ngl::Random::randomPositiveNumber(1000.0f));
+    _p.life = 10 + static_cast<int>(ngl::Random::randomPositiveNumber(2000.0f));
     _p.size = 0.1f;
     _p.density = 0.0f;  // Initialize density
     _p.pressure = 0.0f; // Initialize pressure
@@ -37,8 +37,6 @@ void Simulator::resetParticle(Particle &_p)
     // Randomize position
     float random_x = ngl::Random::randomNumber(0.5f);
     _p.pos.m_x += random_x;
-
-
 }
 
 void Simulator::birthParticles()
@@ -62,7 +60,6 @@ void Simulator::update(float _delta)
 {
     // std::cout<<"update\n";
     float dt=_delta;
-    ngl::Vec3 gravity(0.0,-9.81f,0.0);
 
     getPressureDensity(); // update pressure and density
 
@@ -79,7 +76,7 @@ void Simulator::update(float _delta)
             ngl::Vec3 r = p2.pos - p.pos;
             float rSquared = r.lengthSquared();
 
-            if (rSquared > 0.0f && rSquared < 1.0)
+            if (rSquared > 0.0f && rSquared < 0.2f)
             {
                 pressureForce += (p.pressure + p2.pressure) / (2 * p2.density) * smoothingKernelGrad(r) * p2.mass;
             }
@@ -165,7 +162,7 @@ float Simulator::smoothingKernel(float _rSquared)
     // https://andrew.gibiansky.com/blog/physics/computational-fluid-dynamics/
     // Wg(r,h)=(315/(64π(h^9))) * ((h^2)−(r^2))^3.
 
-    float h = 0.7f; //smoothing bandwith
+    float h = 0.01f; //smoothing bandwith
     float coefficient = 315/ (64.0f * M_PI * std::pow(h, 9));
     auto kernel = coefficient * std::pow((std::pow(h, 2) - _rSquared), 3);
 
@@ -190,7 +187,7 @@ float Simulator::smoothingKernelLaplacian(const ngl::Vec3 &_r)
 {
     // Laplacian of the smoothing kernel
     // Wg_laplacian(r,h) = d^2(Wg(r,h))/dr^2
-    float h = 0.7f; // smoothing bandwidth
+    float h = 1.50f; // smoothing bandwidth
     float coefficient = -945.0f / (32.0f * M_PI * std::pow(h, 9));
     float q = std::sqrt(_r.lengthSquared()) / h;
     return coefficient * (3.0f * q * q - 1.0f) * std::pow((1.0f - q * q), 2);
@@ -206,7 +203,7 @@ ngl::Vec3 Simulator::applyViscosity(const Particle &_p)
         ngl::Vec3 r = neighbor.pos - _p.pos;
         float rSquared = r.lengthSquared();
 
-        if (rSquared > 0.0f && rSquared < 1.0)
+        if (rSquared > 0.0f && rSquared < 1.0f)
         {
             viscosityForce += (neighbor.dir - _p.dir) * smoothingKernelLaplacian(r) * _p.mass;
         }

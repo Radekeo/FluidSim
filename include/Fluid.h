@@ -9,12 +9,16 @@ struct Particle
     ngl::Vec3 pos;
     ngl::Vec3 dir;
     ngl::Vec3 colour;
-    float size=1.0f;
-    float density = 0.0f;
-    float pressure = 0.0f;
+    ngl::Vec3 velocity;
+    ngl::Vec3 acceleration;
+
+    float restDensity = .01f;
+    float size=0.5f;
+    float density = 1.0f;
+    float pressure = 0.5f;
     float mass = static_cast <float> (std::rand()) / static_cast <float> (RAND_MAX);
     float stiffness = 0.2f;
-    int life=100;
+    int life=200;
 };
 
 struct Fluid
