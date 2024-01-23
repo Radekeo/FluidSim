@@ -32,7 +32,7 @@ void NGLScene::initializeGL()
     // enable multisampling for smoother drawing
     glEnable(GL_MULTISAMPLE);
 
-    m_emitter=std::make_unique<Simulator>(ngl::Vec3(0.0f, 5.0f, 0.0f), 100);
+    m_emitter=std::make_unique<Simulator>(ngl::Vec3(0.0f, 5.0f, 0.0f), 300);
 
     ngl::ShaderLib::loadShader("ParticleShader","shaders/ParticleVertex.glsl","shaders/ParticleFragment.glsl");
     ngl::ShaderLib::use("ParticleShader");

@@ -13,7 +13,7 @@ struct Particle
     ngl::Vec3 acceleration;
 
     float restDensity = .01f;
-    float size=0.5f;
+    float size=1.0f;
     float density = 1.0f;
     float pressure = 0.5f;
     float mass = static_cast <float> (std::rand()) / static_cast <float> (RAND_MAX);
