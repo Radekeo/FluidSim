@@ -17,7 +17,7 @@ struct Particle
     float density = 1.0f;
     float pressure = 0.5f;
     float mass = static_cast <float> (std::rand()) / static_cast <float> (RAND_MAX);
-    float stiffness = 0.2f;
+    float stiffness = 10.0f;
     int life=200;
 };
 

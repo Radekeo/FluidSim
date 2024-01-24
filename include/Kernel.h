@@ -6,15 +6,20 @@
 #define KERNEL_H_
 
 #include "Fluid.h"
-class Kernel
+
+struct Kernel
 {
 public :
-    Kernel();
-    bool nonZeroDist(Particle _p1, Particle _p2);
-    float smoothingKernel(float _r);
-    ngl::Vec3 smoothingKernelGrad(const ngl::Vec3 &_r);
-    float smoothingKernelLaplacian(const ngl::Vec3 &_r);
+    Kernel() = default;
+    float smoothingKernel(float _rSquared);
+    ngl::Vec3 smoothingKernelGrad(ngl::Vec3 _r);
+    float smoothingKernelLaplacian(Particle &_p1, Particle &_p2);
+    ngl::Vec3 pressureGrad(Particle &_p1, Particle &_p2);
+//    const bool nonZeroDist(Particle &_p1, Particle &_p2);
+
 private:
-    float m_h = 10.0f;
+    float m_h = 10.0f; //smoothing bandwidth
+
+
 };
 #endif
