@@ -15,10 +15,9 @@ public :
     ngl::Vec3 smoothingKernelGrad(ngl::Vec3 _r);
     float smoothingKernelLaplacian(Particle &_p1, Particle &_p2);
     ngl::Vec3 pressureGrad(Particle &_p1, Particle &_p2);
-//    const bool nonZeroDist(Particle &_p1, Particle &_p2);
 
 private:
-    float m_h = 10.0f; //smoothing bandwidth
+    float m_h = 1000.0f; //smoothing bandwidth
 
 
 };

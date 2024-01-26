@@ -22,6 +22,8 @@ public :
     /// @param [in] _parent the parent window to create the GL context in
     //----------------------------------------------------------------------------------------------------------------------
     NGLScene(QWidget *_parent );
+    // User Input
+    void setViscosity(float m_v);
 
     /// @brief dtor
     ~NGLScene() override;
@@ -52,6 +54,7 @@ protected:
     ngl::Mat4 m_view;
     ngl::Mat4 m_project;
     std::chrono::steady_clock::time_point m_previousTime;
+
 
 private :
     /// @brief Qt Event called when a key is pressed

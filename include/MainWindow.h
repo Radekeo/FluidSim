@@ -14,6 +14,7 @@ Q_OBJECT
 
 public:
     explicit MainWindow(QWidget *parent = 0);
+    void onViscositySliderChanged(int value);
     ~MainWindow();
 
 private:

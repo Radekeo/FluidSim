@@ -1,18 +1,40 @@
 # Moradeke Onamusi Fluid Simulator
 
-## Overview
+## Interactive Fluid Simulator
 
-### Fluid Simulation Project
+This C++ program simulates a fluid system using a particle-based approach. It utilizes the NGL library and Qt for user interface integration.
 
-A C++ and OpenGL-based 3D application that creates and visualizes fluid simulations
+## Features
 
-### Features
-- Real-time, interactive fluid simulation
-- Interface for control of fluid properties
+- Particle-based fluid simulation.
+- Real-time visualization of fluid dynamics.
+- Adjustable parameters for fluid behavior.
+
+## Prerequisites
+
+- C++ compiler supporting C++11 standard.
+- NGL (NCCA Graphics Library)
+- Qt 5 0r 6
+
+## Installation
+
+1. Clone or download the repository to your local machine.
+2. Build the source files ( e.g using CMAKE).
+3. Ensure that NGL and Qt libraries are properly linked during compilation.
+4. Run the executable file generated after compilation.
+
+## Usage
+
+1. Upon running the program, you will see the fluid simulation window.
+2. Adjust the parameters for fluid behavior as needed. These parameters may include viscosity, surface tension, particle size, etc.
+3. Interact with the simulation using the provided user interface elements.
+4. Observe the real-time visualization of fluid dynamics, including particle movement and collisions.
+
+## Contributing
+Contributions are welcome! If you have suggestions for improvements, feel free to open an issue or submit a pull request.
 
 ### Approach
-- Modify particle system from ase-labs
-- Apply algorithm such as Smoothed-particle hydrodynamics for making particles act more like fluids
-    - Reference Papers: http://www.ligum.umontreal.ca/Clavet-2005-PVFS/pvfs.pdf, 
-- Implement code for animation algorithm
-- Make a gui that takes input for different fluid properties which would affect fluid behaviours in the simulation
+- Modified particle system from ase-labs
+- Applied equation for Smoothed-particle hydrodynamics for making particles act more like fluids
+    - Reference Article: https://andrew.gibiansky.com/blog/physics/computational-fluid-dynamics/ 
+- Implemented a QT gui that takes input for different fluid properties which would affect fluid behaviours in the simulation

@@ -30,7 +30,8 @@ float Kernel::smoothingKernelLaplacian(Particle &_p1, Particle &_p2)
     float coefficient1 = 1.0f/(2.0f * std::pow(m_h, 3));
     float coefficient2 = 1.0f/std::pow(m_h, 2);
     float coefficient3 = m_h;
-    return (-(coefficient1 * (std::pow(r, 3))) + (coefficient2 * std::pow(r,2)) + (coefficient3/(2*r))) - 1;
+    float kernel = (-(coefficient1 * (std::pow(r, 3))) + (coefficient2 * std::pow(r,2)) + (coefficient3/(2*r))) - 1;
+    return kernel;
 }
 
 ngl::Vec3 Kernel::pressureGrad(Particle &_p1, Particle &_p2)
@@ -58,15 +59,3 @@ ngl::Vec3 Kernel::smoothingKernelGrad(const ngl::Vec3 _r)
     float q = std::sqrt(_r.lengthSquared()) / m_h;
     return coefficient * _r * std::pow((1.0f - q * q), 2);
 }
-
-//const bool Kernel::nonZeroDist(Particle &_p1, Particle &_p2)
-//{
-////    float normsq = pow((_p1.pos.m_x- _p2.pos.m_x ), 2)+ pow((_p1.pos.m_y- _p2.pos.m_y ), 2) + pow((_p1.pos.m_z- _p2.pos.m_z), 2);
-//    float normSq =  (_p1.pos - _p2.pos).lengthSquared();
-//    float sq = std::pow(m_h,2);
-//    if(normSq > sq)
-//    {
-//        return false;
-//    }
-//    return true;
-//}

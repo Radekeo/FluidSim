@@ -20,138 +20,128 @@ Simulator::Simulator(ngl::Vec3 _pos, size_t _numParticles) : m_pos{_pos}
 void Simulator::resetParticle(Particle &_p)
 {
     _p.pos=m_pos;
+    float y_interval = -0.1f;
     // Set initial direction to fall downward
-//   _p.dir = ngl::Vec3(0.0f, -1.0f, 0.0f);
-   _p.dir = randomVectorOnSphere(m_spread);
+   _p.dir = ngl::Vec3(0.5f, 1.0f, 0.0f);
+//   _p.dir = randomVectorOnSphere(m_spread);
 
 //  _p.dir.m_y = std::abs(_p.dir.m_y);
-    _p.colour=ngl::Random::getRandomColour3();
-//    _p.life = 10 + static_cast<int>(ngl::Random::randomPositiveNumber(2000.0f));
-    _p.size = 0.1f;
-    _p.density = 0.0f;  // Initialize density
-    _p.pressure = 0.0f; // Initialize pressure
+    _p.life = 10 + static_cast<int>(ngl::Random::randomPositiveNumber(10.0f));
+    _p.density = 0.5f;  // Initialize density
 
-    // Randomize position
-    float random_x = ngl::Random::randomNumber(0.5f);
+    // Randomize x position
+    float random_x = ngl::Random::randomNumber(10.0f) - 10.0f;
     _p.pos.m_x += random_x;
-    float y_interval = -0.1f;
     _p.pos.m_y += y_interval;
+    m_pos.m_y = _p.pos.m_y;
 }
 
 void Simulator::birthParticles()
 {
+    auto dont = static_cast<int>(ngl::Random::randomPositiveNumber(100.0f));
+    if(dont <= 10)
+        return;
     auto births = 0 + static_cast<int>(ngl::Random::randomPositiveNumber(m_numPerFrame));
     for(size_t i=0; i<births; ++i)
     {
         for(auto &p : m_fluid.particles)
         {
-            if(p.life <= 0)
+            if(p.alive == ParticleState::Dead)
             {
                 resetParticle(p);
+                p.alive=ParticleState::Alive;
                 break;
             }
         }
     }
 }
 
+void Simulator::addParticles()
+{
+    for (auto &p : m_fluid.particles)
+    {
+        if (p.alive == ParticleState::Dead)
+        {
+            resetParticle(p);
+            p.alive = ParticleState::Alive;
+        }
+    }
+}
+
+
 void Simulator::update(float _delta)
 {
     // std::cout<<"update\n";
     float dt=_delta;
-    /* Find accelerations */
-    for(auto &p : m_fluid.particles){
-        calculateAcceleration(p);
+//    ngl::Vec3 gravity(0.0,-9.81f,0.0);
+    size_t numAlive = std::count_if(std::begin(m_fluid.particles),std::end(m_fluid.particles),
+                                    [](auto p)
+                                    {
+                                        return p.alive == ParticleState::Alive;
+                                    });
+    if(numAlive < m_maxAlive)
+    {
+        birthParticles();
     }
-//
-//
+
+    precalculateDensity(); // update density for each particle
     for (auto &p : m_fluid.particles)
     {
-        // apply acceleration
-        p.velocity = p.acceleration * _delta;
-        // Apply gravity
-//        p.dir += gravity * dt * 0.5f;
-        // Reset Acceleration to Zero
-        p.acceleration.m_x = 0.0f;
-        p.acceleration.m_y = 0.0f;
-        p.acceleration.m_z = 0.0f;
-    }
+        if (p.alive == ParticleState::Alive)
+        {
+            // Check if particle crosses boundary on X-axis
+            if (p.pos.m_x <= -10.0f || p.pos.m_x >= 10.0f)
+            {
+                // Reset particle position to stay within the boundary
+                float new_x = std::min(std::max(p.pos.m_x, -10.0f), 10.0f);
+                p.pos.m_x = new_x;
+            }
+        }
+        if(p.alive == ParticleState::Dead)
+            continue;
 
-    for(auto &p : m_fluid.particles) {
-        p.pos += p.velocity * dt;
+        // Apply Force Terms
+        //Pressure Force
+        ngl::Vec3 pressureForce = calculatePressure(p);
+        // Apply viscosity force
+        ngl::Vec3 viscosityForce = applyViscosity(p);
+        // Apply External Force
+        ngl::Vec3 externalForce = calculateExternalForce(p);
+        // Apply Surface Tension
+        ngl::Vec3 surfaceForce = calculateSurfaceTension(p);
+
+        ngl::Vec3 totalForce = pressureForce + viscosityForce + surfaceForce + externalForce;
+        p.dir += totalForce/p.density;
+
+        // Update particle position
+        p.pos += p.dir * 0.075f;
+        p.life -= 1;
+
+//        Clamp particles so they don't fall below the grid
         p.pos.m_y = std::max(p.pos.m_y, 0.0f);
+
+        if(p.pos.m_x <= -50.0f || p.pos.m_x > 50.0f || p.life <=0.0f)
+        {
+            resetParticle(p);
+        }
+
     }
-    // Check for collisions
-    for(auto &p : m_fluid.particles) {
-        applyCollisions(p);
-    }
+    addParticles();
 }
 
-//void Simulator::update(float _delta)
-//{
-//    // std::cout<<"update\n";
-//    float dt=_delta;
-////    ngl::Vec3 gravity(0.0,-9.81f,0.0);
-//
-//    precalculatePressureDensity(); // update pressure and density
-//    for (auto &p : m_fluid.particles)
-//    {
-//        // Apply gravity
-//        p.dir += m_gravity * dt * 0.5f;
-//
-//        // Apply pressure force
-//        ngl::Vec3 pressureForce = calculatePressure(p);
-//        p.dir += pressureForce;
-//
-//        // Apply viscosity force
-//        ngl::Vec3 viscosityForce = applyViscosity(p);
-//        p.dir += viscosityForce;
-//
-//        // Apply Surface Tension
-//        ngl::Vec3 surfaceForce = calculateSurfaceTension(p);
-//        p.dir += surfaceForce;
-//
-//        // Apply External Force
-//        ngl::Vec3 externalForce = calculateExternalForce(p);
-//        p.dir += externalForce;
-//
-//        // Update particle position
-//        p.pos += p.dir * 0.5f;
-//        p.life -= 1;
-//
-//        // Clamp particles so they don't fall below the grid
-//        p.pos.m_y = std::max(p.pos.m_y, 0.0f);
-//    }
-//}
-
-void Simulator::calculateAcceleration(Particle &_p)
-{
-    precalculatePressureDensity();
-    /* Calculate individual force terms */
-    ngl::Vec3 pressureForce = calculatePressure(_p);
-    ngl::Vec3 viscosityForce = calculateViscosity(_p);
-    ngl::Vec3 externalForce = calculateExternalForce(_p);
-    ngl::Vec3 surfaceForce = calculateSurfaceTension(_p);
-
-    ngl::Vec3 totalForce = pressureForce + viscosityForce + externalForce + surfaceForce;
-    _p.acceleration = totalForce / _p.density;
-}
-
-void Simulator::precalculatePressureDensity()
+void Simulator::precalculateDensity()
 {
     for (auto &p1 : m_fluid.particles) {
-        p1.density = 0.0f;
 
         for (auto &p2: m_fluid.particles) {
             ngl::Vec3 dist = p2.pos - p1.pos;
             float rSquared = dist.lengthSquared();
             float r = std::sqrt(rSquared);
 
-            if (r>0) {
+            if (r>0 && r < 1) {
                 p1.density += p1.mass * m_kernel.smoothingKernel(rSquared);
             }
         }
-        // Update pressure for each particle
-        p1.pressure = p1.stiffness * (p1.density - p1.restDensity);
     }
 }
 
@@ -166,33 +156,15 @@ ngl::Vec3 Simulator::applyViscosity(Particle &_p)
         float rSquared = dist.lengthSquared();
         float  r = std::sqrt(rSquared);
 
-        if (r > 0)
+        if (r > 0 && r < 1)
         {
             viscosityForce += (neighbor.dir - _p.dir) * m_kernel.smoothingKernelLaplacian(_p, neighbor) * _p.mass;
         }
     }
 
     // Scale by viscosity coefficient
-    viscosityForce *= 0.8f;
+    viscosityForce *= m_viscosity;
 
-    return viscosityForce;
-}
-ngl::Vec3 Simulator::calculateViscosity(Particle &_p)
-{
-    // fviscosityi=μ∇2v(r⃗ i)=μ∑mjvjρj∇2W(|r⃗ i−r⃗ j|,h).
-    ngl::Vec3 sum;
-    for(auto &p1 : m_fluid.particles)
-    {
-        float product = 1.0f;
-        product *= p1.mass;
-        product *= 1/p1.density;
-
-        ngl::Vec3 difference = p1.velocity - _p.velocity;
-        float factor = m_kernel.smoothingKernelLaplacian(_p,p1);
-        sum += product * difference* factor;
-    }
-
-    ngl::Vec3 viscosityForce = sum;
     return viscosityForce;
 }
 
@@ -211,8 +183,13 @@ ngl::Vec3 Simulator::calculateSurfaceTension(Particle &_p)
         product *= p1.mass;
         product *= 1/p1.density;
 
-        ngl::Vec3 factor = m_kernel.smoothingKernelGrad(_p.pos - p1.pos);
-        sum += product * factor;
+        float r = std::sqrt((_p.pos- p1.pos).lengthSquared());
+        if (r > 0 && r < 1)
+        {
+            ngl::Vec3 factor = m_kernel.smoothingKernelGrad(_p.pos - p1.pos);
+            sum += product * factor;
+        }
+
     }
 
     double magN = std::sqrt(std::pow(sum.m_x, 2) + std::pow(sum.m_y, 2) + std::pow(sum.m_z, 2));
@@ -236,7 +213,7 @@ ngl::Vec3 Simulator::calculateSurfaceTension(Particle &_p)
         surfaceForce /= magN;
         return surfaceForce * sum;
     } else {
-        ngl::Vec3 zeroVec = {0.0f, 0.0f, 0.0f};
+        ngl::Vec3 zeroVec;
         return zeroVec;
     }
 }
@@ -246,17 +223,20 @@ ngl::Vec3 Simulator::calculatePressure(Particle &_p)
     ngl::Vec3 pressureForce;
     //p=kρ
     // stiffness represents constant k
+    float pressure1 = _p.stiffness * (_p.density - _p.restDensity);
     for (auto &p2: m_fluid.particles)
     {
+        float pressure2 = p2.stiffness * (p2.density - p2.restDensity);
         ngl::Vec3 dist = p2.pos - _p.pos;
         float rSquared = dist.lengthSquared();
-        if (rSquared > 0.0f && rSquared < 1.0)
+        float r = std::sqrt(rSquared);
+        if (r > 0.0f && r < 1.0f)
         {
             // @Pressure Equation
             // Author: Andrew Gibiansky
             // https://andrew.gibiansky.com/blog/physics/computational-fluid-dynamics/
             //fpressurei=−∇p(r⃗ )=−∑(mj((pi+pj)/2ρj))∇W(|r⃗ i−r⃗ j|,h).
-            pressureForce += (((_p.pressure + p2.pressure) / (2 * p2.density)) * p2.mass) * m_kernel.pressureGrad(_p, p2);
+            pressureForce += (((pressure1 + pressure2) / (2 * p2.density)) * p2.mass) * m_kernel.pressureGrad(_p, p2);
         }
     }
     return pressureForce;
@@ -264,7 +244,7 @@ ngl::Vec3 Simulator::calculatePressure(Particle &_p)
 
 void Simulator::draw() const
 {
-    glPointSize(4.0);
+    glPointSize(6.0);
     m_vao->bind();
     m_vao->setData(ngl::AbstractVAO::VertexData(m_fluid.particles.size()*sizeof(Particle),m_fluid.particles[0].pos.m_x));
     m_vao->setVertexAttributePointer(0,3,GL_FLOAT,sizeof(Particle),0);
@@ -280,6 +260,8 @@ void Simulator::draw() const
     for(auto &p : m_fluid.particles)
     {
         std::cout<<p.pos.m_x<<' '<<p.pos.m_y<<' '<<p.pos.m_z<<'\n';
+        std::cout<<'+++++++++++++++++++++++++++ '<<'\n';
+        std::cout<<m_viscosity<<'\n';
     }
 }
 
@@ -297,27 +279,8 @@ ngl::Vec3 Simulator::randomVectorOnSphere(float _radius)
 }
 
 void Simulator::applyCollisions(Particle &_p) {
-    float dampingFactor = 0.8f;
-    if (_p.pos.m_y <= 40) {
-        _p.pos.m_y = 40.0f;
-        _p.velocity.m_y = -_p.velocity.m_y * dampingFactor;
-    }
-    if (_p.pos.m_x < 50 ) {
-        _p.pos.m_x = 50.0f;
-        _p.velocity.m_x = -_p.velocity.m_x * dampingFactor;
-    }
-    if (_p.pos.m_x > 350) {
-        _p.pos.m_x = 350;
-        _p.velocity.m_x = -_p.velocity.m_x  * dampingFactor;
-    }
-    if (_p.pos.m_z < 50 ) {
-        _p.pos.m_z = 50.0f;
-        _p.velocity.m_z = -_p.velocity.m_z * dampingFactor;
-    }
-    if (_p.pos.m_x > 350) {
-        _p.pos.m_x = 350;
-        _p.velocity.m_z = -_p.velocity.m_z  * dampingFactor;
-    }
+    //TODO
+    return;
 }
 
 
@@ -330,4 +293,3 @@ ngl::Vec3 Simulator::getPosition() const
 {
     return m_pos;
 }
-
