@@ -3,8 +3,7 @@
 ## Interactive Fluid Simulator
 
 This C++ program simulates a fluid system using a particle-based approach. It utilizes the NGL library and Qt for user interface integration.
-
-[![Watch the video](https://upload.wikimedia.org/wikipedia/commons/thumb/0/0f/Blank_Square.svg/768px-Blank_Square.svg.png)](https://youtu.be/42dceEBtcG0)
+![FluidSimulator](https://github.com/NCCA/ase-assignment-Radekeo/assets/66294398/da5485fa-7494-43b7-ad1d-e67ef20e8472)
 
 ## Features
 
