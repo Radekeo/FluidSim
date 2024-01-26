@@ -4,6 +4,8 @@
 
 This C++ program simulates a fluid system using a particle-based approach. It utilizes the NGL library and Qt for user interface integration.
 
+[![Watch the video](https://i.stack.imgur.com/Vp2cE.png)](https://youtu.be/42dceEBtcG0)
+
 ## Features
 
 - Particle-based fluid simulation.
