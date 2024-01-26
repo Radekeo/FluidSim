@@ -32,7 +32,7 @@ void NGLScene::initializeGL()
     // enable multisampling for smoother drawing
     glEnable(GL_MULTISAMPLE);
 
-    m_emitter=std::make_unique<Simulator>(ngl::Vec3(0.0f, 5.0f, 0.0f), 4000);
+    m_emitter=std::make_unique<Simulator>(ngl::Vec3(0.0f, 5.0f, 0.0f), 3000);
 
     ngl::ShaderLib::loadShader("ParticleShader","shaders/ParticleVertex.glsl","shaders/ParticleFragment.glsl");
     ngl::ShaderLib::use("ParticleShader");
@@ -113,7 +113,7 @@ void NGLScene::timerEvent(QTimerEvent *_event)
 
 void NGLScene::setViscosity(float m_v)
 {
-    m_emitter->m_viscosity = m_v;
+    m_emitter->m_viscosity = 5.0f * m_v;
 }
 
 NGLScene::~NGLScene()

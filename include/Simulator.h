@@ -15,6 +15,7 @@ public :
     Simulator(ngl::Vec3 _pos, size_t _numParticles);
     size_t numParticles() const;
     ngl::Vec3 getPosition() const;
+    ngl::Vec3 randomFlow(float _radius);
 
     void draw() const;
     void update(float _delta);
@@ -37,14 +38,14 @@ private :
     void applyCollisions(Particle &_p);
 
     Fluid m_fluid;
-    ngl::Vec3 m_pos = {0.0f, 20.0f, 0.0f};
-    ngl::Vec3 m_emitDir={0.5f,-9.8f,0.0f};
-    ngl::Vec3 m_gravity= {0.0f,-0.98f,0.0f};
-    float m_spread=0.1f;
+    ngl::Vec3 m_pos = {0.0f, 50.0f, 0.0f};
+    ngl::Vec3 m_emitDir={0.5f,-1.0f,0.0f};
+    ngl::Vec3 m_gravity= {0.0f, -9.8f,0.0f};
+    float m_spread=0.5f;
     // max alive at one time
     size_t m_maxAlive = 1000;
     // max birthed at one time
-    size_t m_numPerFrame =800;
+    size_t m_numPerFrame =50;
     std::unique_ptr<ngl::AbstractVAO> m_vao;
 
 

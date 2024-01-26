@@ -26,7 +26,7 @@ This C++ program simulates a fluid system using a particle-based approach. It ut
 ## Usage
 
 1. Upon running the program, you will see the fluid simulation window.
-2. Adjust the parameters for fluid behavior as needed. These parameters may include viscosity, surface tension, particle size, etc.
+2. Adjust the viscosity parameter for fluid behavior as needed.
 3. Interact with the simulation using the provided user interface elements.
 4. Observe the real-time visualization of fluid dynamics, including particle movement and collisions.
 

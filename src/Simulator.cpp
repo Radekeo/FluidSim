@@ -22,16 +22,25 @@ void Simulator::resetParticle(Particle &_p)
     _p.pos=m_pos;
     float y_interval = -0.1f;
     // Set initial direction to fall downward
-   _p.dir = ngl::Vec3(0.5f, 1.0f, 0.0f);
-//   _p.dir = randomVectorOnSphere(m_spread);
+   _p.dir = ngl::Vec3(0.0f, -1.0f, 0.0f);
+   _p.life = 200 + static_cast<int>(ngl::Random::randomPositiveNumber(1000.0f));
 
-//  _p.dir.m_y = std::abs(_p.dir.m_y);
-    _p.life = 10 + static_cast<int>(ngl::Random::randomPositiveNumber(10.0f));
-    _p.density = 0.5f;  // Initialize density
+//   _p.dir = randomVectorOnSphere(1.0f);
+//   _p.dir = randomFlow(m_spread);
 
     // Randomize x position
-    float random_x = ngl::Random::randomNumber(10.0f) - 10.0f;
-    _p.pos.m_x += random_x;
+    float random_x = ngl::Random::randomNumber(10.0f);
+    float diff1 = abs(_p.pos.m_x - 10);
+    float diff2 = abs(_p.pos.m_x - (-10));
+
+    if (diff1 <= diff2)
+    {
+        _p.pos.m_x += random_x;
+    }
+    else
+    {
+        _p.pos.m_x += -random_x;
+    }
     _p.pos.m_y += y_interval;
     m_pos.m_y = _p.pos.m_y;
 }
@@ -87,14 +96,24 @@ void Simulator::update(float _delta)
     precalculateDensity(); // update density for each particle
     for (auto &p : m_fluid.particles)
     {
+        p.dir = randomVectorOnSphere(m_spread);
         if (p.alive == ParticleState::Alive)
         {
             // Check if particle crosses boundary on X-axis
-            if (p.pos.m_x <= -10.0f || p.pos.m_x >= 10.0f)
+            if (p.pos.m_x <= -40.0f || p.pos.m_x >= 40.0f)
             {
+                float diff1 = abs(p.pos.m_x - 40);
+                float diff2 = abs(p.pos.m_x - (-40));
                 // Reset particle position to stay within the boundary
-                float new_x = std::min(std::max(p.pos.m_x, -10.0f), 10.0f);
-                p.pos.m_x = new_x;
+                float new_x = std::max(0.0f, ngl::Random::randomNumber(40));
+                if (diff1 >= diff2)
+                {
+                    p.pos.m_x = new_x;
+                }
+                else
+                {
+                    p.pos.m_x = -new_x;
+                }
             }
         }
         if(p.alive == ParticleState::Dead)
@@ -114,19 +133,25 @@ void Simulator::update(float _delta)
         p.dir += totalForce/p.density;
 
         // Update particle position
-        p.pos += p.dir * 0.075f;
+        p.pos += p.dir * 0.5f;
         p.life -= 1;
 
 //        Clamp particles so they don't fall below the grid
-        p.pos.m_y = std::max(p.pos.m_y, 0.0f);
+        p.pos.m_y = std::max(p.pos.m_y, -3.0f);
 
         if(p.pos.m_x <= -50.0f || p.pos.m_x > 50.0f || p.life <=0.0f)
         {
             resetParticle(p);
         }
-
     }
     addParticles();
+
+    for (auto &p : m_fluid.particles)
+    {
+        applyCollisions(p);
+    }
+
+   m_spread += 0.1;
 }
 
 void Simulator::precalculateDensity()
@@ -244,7 +269,7 @@ ngl::Vec3 Simulator::calculatePressure(Particle &_p)
 
 void Simulator::draw() const
 {
-    glPointSize(6.0);
+    glPointSize(8.0);
     m_vao->bind();
     m_vao->setData(ngl::AbstractVAO::VertexData(m_fluid.particles.size()*sizeof(Particle),m_fluid.particles[0].pos.m_x));
     m_vao->setVertexAttributePointer(0,3,GL_FLOAT,sizeof(Particle),0);
@@ -260,7 +285,6 @@ void Simulator::draw() const
     for(auto &p : m_fluid.particles)
     {
         std::cout<<p.pos.m_x<<' '<<p.pos.m_y<<' '<<p.pos.m_z<<'\n';
-        std::cout<<'+++++++++++++++++++++++++++ '<<'\n';
         std::cout<<m_viscosity<<'\n';
     }
 }
@@ -277,10 +301,49 @@ ngl::Vec3 Simulator::randomVectorOnSphere(float _radius)
                      r*cosf(theta)
     );
 }
+ngl::Vec3 Simulator::randomFlow(float _radius)
+{
+    float phi, theta, r;
+    float u = ngl::Random::randomPositiveNumber();
 
+    // Adjust behavior based on radius
+    if (_radius <= 1.0f) {
+        // Flowing out of the tap
+    phi = ngl::Random::randomPositiveNumber(M_PI * 2.0f);
+    theta = acosf(ngl::Random::randomNumber());
+    r = _radius * std::cbrt(u);
+    } else if (_radius <= 3.0f) {
+        // Transition to wider space
+        phi = ngl::Random::randomPositiveNumber(M_PI * 4.0f);  // Adjust angle range
+        theta = acosf(ngl::Random::randomNumber());
+        r = _radius * std::cbrt(u);
+    } else {
+        // Freely flowing
+        phi = ngl::Random::randomPositiveNumber(M_PI * 2.0f);
+        theta = acosf(ngl::Random::randomNumber());
+        r = _radius * std::cbrt(u);
+    }
+
+    // Convert spherical coordinates to Cartesian coordinates
+    return ngl::Vec3(r * sinf(theta) * cosf(phi),
+                     r * sinf(theta) * sinf(phi),
+                     r * cosf(theta)
+    );
+}
 void Simulator::applyCollisions(Particle &_p) {
-    //TODO
-    return;
+    float dampingFactor = 1.2f;
+
+    // Check for collisions with boundaries
+    if (_p.pos.m_y <= -3.1f) {
+        // Collision with ground
+        _p.pos.m_y = -3.0f; // Set particle position to ground level
+        _p.velocity.m_y = -_p.velocity.m_y * dampingFactor; // Reverse and dampen y velocity
+    }
+    if (abs(_p.pos.m_x) > 40.0f) {
+        // Collision with x-axis boundary
+        _p.pos.m_x = 10.0f * (_p.pos.m_x > 0 ? 1 : -1); // Clamp particle position within boundary
+        _p.velocity.m_x = -_p.velocity.m_x * dampingFactor; // Reverse and dampen x velocity
+    }
 }
 
 

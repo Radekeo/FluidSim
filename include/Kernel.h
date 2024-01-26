@@ -17,7 +17,7 @@ public :
     ngl::Vec3 pressureGrad(Particle &_p1, Particle &_p2);
 
 private:
-    float m_h = 1000.0f; //smoothing bandwidth
+    float m_h = 100.0f; //smoothing bandwidth
 
 
 };
